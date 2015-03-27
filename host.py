@@ -1,51 +1,62 @@
+#!/usr/bin/env python3
+# -*-coding: utf-8 -*-
 import os
 
 
-class WriteHost():
-
+class WriteHost:
     def __init__(self):
-        pass
+        self.choice = 0
 
-    def go(self):
-        print('Select action')
-        print('1 - create catalog and host file')
-        print('2 - create only host file')
-        print('3 - exit')
-
-        action = int(input('Enter num: '))
-
-        if action == 1:
-            self.createcatalog(1)
-        elif action == 2:
-            self.createcatalog(0)
-        else:
+    def get_choice(self):
+        print('''
+        ================================
+        Select action:
+        1 - create catalog end host file
+        2 - create only host file
+        3 - exit
+        ================================
+        ''')
+        try:
+            self.choice = int(input('? '))
+        except Exception:
+            print('Your choice is wrong! Please, try again...')
             exit()
 
-    def createcatalog(self, cat):
-        catalog = input('Enter dir name for site (/var/www/...):')
+    def main(self):
+        self.get_choice()
+        if self.choice == 1:
+            self.create_catalog(1)
+        elif self.choice == 2:
+            self.create_catalog(0)
+        else:
+            print("Good bye!")
+            exit()
+
+    def create_catalog(self, cat):
+        catalog = str(input('Enter dir name for site (/var/www/...):'))
         if catalog == '':
-            self.createcatalog(cat)
+            self.create_catalog(cat)
 
         if cat == 1:
             print('Creating directory /var/www/' + catalog + '...\n')
-            os.system('mkdir /var/www/' + catalog)
+            os.system('sudo mkdir /var/www/' + catalog)
 
-        self.createhost(catalog)
+        self.create_host(catalog)
 
-    def createhost(self, catalog):
+    def create_host(self, catalog):
         hostname = input('Enter hostname:')
         if hostname == '':
-            self.createhost(catalog)
+            self.create_host(catalog)
 
         print('Add to host file... \n')
         with open('/etc/hosts', 'rt') as f:
             s = f.read() + '\n' + '127.0.0.1\t\t\t' + hostname + '\n'
-            with open('/tmp/etc_hosts.tmp', 'wt') as outf:
-                outf.write(s)
+            with open('/tmp/etc_hosts.tmp', 'wt') as file:
+                file.write(s)
         os.system('sudo mv /tmp/etc_hosts.tmp /etc/hosts')
 
         print('Generate virtual host file...\n')
-        with open('/tmp/' + hostname + '.tmp', 'wt') as hostfile:
+        with open('/tmp/' + hostname + '.tmp', 'wt') as file:
             conf = '<VirtualHost ' + hostname + '>\n'
             conf += '\tDocumentRoot /var/www/' + catalog + '\n'
             conf += '\t<Directory "/var/www/' + catalog + '">\n'
@@ -54,7 +65,7 @@ class WriteHost():
             conf += '\t\tAllowOverride All\n'
             conf += '\t</Directory>\n'
             conf += '</VirtualHost>'
-            hostfile.write(conf)
+            file.write(conf)
 
         os.system('sudo mv /tmp/' + hostname + '.tmp /etc/apache2/sites-available/' + hostname + '.conf')
         os.system('sudo a2ensite ' + hostname + '.conf')
@@ -63,4 +74,4 @@ class WriteHost():
 if __name__ == "__main__":
     print('Generate virtual host script.\n')
     h = WriteHost()
-    h.go()
+    h.main()
