@@ -8,11 +8,11 @@ class WriteHost():
 
     def go(self):
         print('Select action')
-        print('1 - create catalog end host file')
+        print('1 - create catalog and host file')
         print('2 - create only host file')
         print('3 - exit')
 
-        action = int(raw_input('Enter num: '))
+        action = int(input('Enter num: '))
 
         if action == 1:
             self.createcatalog(1)
@@ -22,7 +22,7 @@ class WriteHost():
             exit()
 
     def createcatalog(self, cat):
-        catalog = raw_input('Enter dir name for site (/var/www/...):')
+        catalog = input('Enter dir name for site (/var/www/...):')
         if catalog == '':
             self.createcatalog(cat)
 
@@ -33,7 +33,7 @@ class WriteHost():
         self.createhost(catalog)
 
     def createhost(self, catalog):
-        hostname = raw_input('Enter hostname:')
+        hostname = input('Enter hostname:')
         if hostname == '':
             self.createhost(catalog)
 
